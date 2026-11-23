@@ -22,12 +22,12 @@
             <div class="top-bar">
                 <div class="top-bar__container">
                     <div class="top-bar__contact">
-                        <a href="tel:+51945762189">
+                        <a href="tel:+51945762189" data-config="telefono-href">
                             <i class="fa-solid fa-phone" aria-hidden="true"></i>
-                            <span>945 762 189</span>
+                            <span data-config="telefono-texto">945 762 189</span>
                         </a>
 
-                        <a href="https://wa.me/51945762189" target="_blank" rel="noopener noreferrer">
+                        <a href="https://wa.me/51945762189" target="_blank" rel="noopener noreferrer" data-config="whatsapp-href">
                             <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                             <span>WhatsApp</span>
                         </a>
@@ -42,6 +42,11 @@
                             <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
                             <span>Mi carrito</span>
                             <span class="cart-count" id="contadorCarrito">0</span>
+                        </a>
+
+                        <a href="fidelizacion.html" id="fidelizacionLink" hidden>
+                            <i class="fa-solid fa-heart" aria-hidden="true"></i>
+                            <span>Fidelización</span>
                         </a>
 
                         <a href="login.html" id="loginLink">
@@ -103,6 +108,7 @@
                         target="_blank"
                         rel="noopener noreferrer"
                         class="contact-button contact-button--light"
+                        data-config="whatsapp-href"
                         >
                         <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                         Escríbenos por WhatsApp
@@ -128,7 +134,7 @@
                             </div>
                             <h3>WhatsApp</h3>
                             <p>Consulta precios, cotiza tortas y coordina tu pedido.</p>
-                            <a href="https://wa.me/51945762189" target="_blank" rel="noopener noreferrer" class="contact-card__link">
+                            <a href="https://wa.me/51945762189" target="_blank" rel="noopener noreferrer" class="contact-card__link" data-config="whatsapp-href">
                                 Enviar mensaje
                                 <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
                             </a>
@@ -140,8 +146,8 @@
                             </div>
                             <h3>Teléfono</h3>
                             <p>Comunícate con nosotros para resolver tus consultas.</p>
-                            <a href="tel:+51945762189" class="contact-card__link">
-                                945 762 189
+                            <a href="tel:+51945762189" class="contact-card__link" data-config="telefono-href">
+                                <span data-config="telefono-texto">945 762 189</span>
                             </a>
                         </article>
 
@@ -150,7 +156,7 @@
                                 <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
                             </div>
                             <h3>Ubicación</h3>
-                            <p>Chorrillos, Lima, Perú.</p>
+                            <p data-config="direccion-texto">Chorrillos, Lima, Perú.</p>
                             <span class="contact-card__note">
                                 Atención mediante pedidos y coordinación previa.
                             </span>
@@ -188,7 +194,7 @@
                             <i class="fa-regular fa-clock" aria-hidden="true"></i>
                             <div>
                                 <h3>Horario de atención</h3>
-                                <p>Lunes a domingo, de 9:00 a. m. a 9:00 p. m.</p>
+                                <p data-config="horario-combinado">Lunes a domingo, de 9:00 a. m. a 9:00 p. m.</p>
                                 <small>Los pedidos están sujetos a disponibilidad.</small>
                             </div>
                         </div>
@@ -460,8 +466,8 @@
 
                 <div class="footer__schedule">
                     <h4>Horario de atención</h4>
-                    <p>Lunes a domingo</p>
-                    <p>9:00 a. m. – 9:00 p. m.</p>
+                    <p data-config="horario-dias">Lunes a domingo</p>
+                    <p data-config="horario-horas">9:00 a. m. – 9:00 p. m.</p>
                     <small>Pedidos sujetos a disponibilidad y coordinación previa.</small>
                 </div>
 
@@ -472,20 +478,22 @@
                         href="https://maps.app.goo.gl/tDPpxJyVBvx9dZFa7"
                         target="_blank"
                         rel="noopener noreferrer"
+                        data-config="maps-href"
                         >
                         <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                        <span>Chorrillos, Lima, Perú</span>
+                        <span data-config="direccion-texto">Chorrillos, Lima, Perú</span>
                     </a>
 
-                    <a href="tel:+51945762189">
+                    <a href="tel:+51945762189" data-config="telefono-href">
                         <i class="fa-solid fa-phone" aria-hidden="true"></i>
-                        <span>945 762 189</span>
+                        <span data-config="telefono-texto">945 762 189</span>
                     </a>
 
                     <a
                         href="https://wa.me/51945762189"
                         target="_blank"
                         rel="noopener noreferrer"
+                        data-config="whatsapp-href"
                         >
                         <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                         <span>WhatsApp</span>
@@ -502,6 +510,7 @@
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Buscar a Graciela Alina Fasanando Huapaya en Facebook"
+                            data-config="facebook-href"
                             >
                             <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
                         </a>
@@ -511,6 +520,7 @@
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Instagram de Las Delicias de Gra"
+                            data-config="instagram-href"
                             >
                             <i class="fa-brands fa-instagram" aria-hidden="true"></i>
                         </a>
@@ -520,6 +530,7 @@
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="WhatsApp de Las Delicias de Gra"
+                            data-config="whatsapp-href"
                             >
                             <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                         </a>
@@ -588,7 +599,7 @@
                 motivo.addEventListener("change", actualizarCampoPedido);
                 mensaje.addEventListener("input", actualizarContador);
 
-                form.addEventListener("submit", (event) => {
+                form.addEventListener("submit", async (event) => {
                     event.preventDefault();
                     formMessage.hidden = true;
 
@@ -628,8 +639,11 @@
                             `Medio de contacto preferido: ${preferencia ? preferencia.value : "WhatsApp"}`
                             );
 
+                    const configuracion = await (window.configuracionPublica || Promise.resolve(null));
+                    const whatsapp = configuracion?.datosNegocio?.whatsapp || "51945762189";
+
                     const url =
-                            "https://wa.me/51945762189?text=" +
+                            `https://wa.me/${whatsapp}?text=` +
                             encodeURIComponent(lineas.join("\n"));
 
                     formMessage.textContent =
@@ -643,6 +657,7 @@
                 actualizarContador();
             });
         </script>
+        <script src="../js/configuracion-publica.js"></script>
         <script src="../js/sesion.js"></script>
     </body>
 </html>

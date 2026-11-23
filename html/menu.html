@@ -35,15 +35,16 @@
                 <div class="top-bar__container">
 
                     <div class="top-bar__contact">
-                        <a href="tel:+51945762189">
+                        <a href="tel:+51945762189" data-config="telefono-href">
                             <i class="fa-solid fa-phone" aria-hidden="true"></i>
-                            <span>945 762 189</span>
+                            <span data-config="telefono-texto">945 762 189</span>
                         </a>
 
                         <a
                             href="https://wa.me/51945762189"
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-config="whatsapp-href"
                             >
                             <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                             <span>WhatsApp</span>
@@ -59,6 +60,11 @@
                             <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
                             <span>Mi carrito</span>
                             <span class="cart-count" id="contadorCarrito">0</span>
+                        </a>
+
+                        <a href="fidelizacion.html" id="fidelizacionLink" hidden>
+                            <i class="fa-solid fa-heart" aria-hidden="true"></i>
+                            <span>Fidelización</span>
                         </a>
 
                         <a href="login.html" id="loginLink">
@@ -256,6 +262,7 @@
                             class="btn btn--outline"
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-config="whatsapp-href"
                             >
                             Consultar por WhatsApp
                         </a>
@@ -305,20 +312,22 @@
                         href="https://maps.app.goo.gl/tDPpxJyVBvx9dZFa7"
                         target="_blank"
                         rel="noopener noreferrer"
+                        data-config="maps-href"
                         >
                         <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                        <span>Chorrillos, Lima, Perú</span>
+                        <span data-config="direccion-texto">Chorrillos, Lima, Perú</span>
                     </a>
 
-                    <a href="tel:+51945762189">
+                    <a href="tel:+51945762189" data-config="telefono-href">
                         <i class="fa-solid fa-phone" aria-hidden="true"></i>
-                        <span>945 762 189</span>
+                        <span data-config="telefono-texto">945 762 189</span>
                     </a>
 
                     <a
                         href="https://wa.me/51945762189"
                         target="_blank"
                         rel="noopener noreferrer"
+                        data-config="whatsapp-href"
                         >
                         <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                         <span>WhatsApp</span>
@@ -335,6 +344,7 @@
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Buscar a Graciela Alina Fasanando Huapaya en Facebook"
+                            data-config="facebook-href"
                             >
                             <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
                         </a>
@@ -344,6 +354,7 @@
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Instagram de Las Delicias de Gra"
+                            data-config="instagram-href"
                             >
                             <i class="fa-brands fa-instagram" aria-hidden="true"></i>
                         </a>
@@ -353,6 +364,7 @@
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="WhatsApp de Las Delicias de Gra"
+                            data-config="whatsapp-href"
                             >
                             <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                         </a>
@@ -549,16 +561,56 @@
             cargarProductos();
 
 
-            function actualizarContadorCarrito() {
+            // Resuelve la clave de localStorage del carrito según la sesión
+            // actual (ver explicación completa en js/sesion.js, que define
+            // la misma función en esta página).
+            (function () {
+                if (window.obtenerClaveCarrito) return;
+
+                let promesaClave = null;
+
+                window.obtenerClaveCarrito = function obtenerClaveCarrito() {
+                    if (!promesaClave) {
+                        promesaClave = (async () => {
+                            try {
+                                const respuesta = await fetch("/api/sesion", {
+                                    credentials: "same-origin",
+                                    cache: "no-store"
+                                });
+
+                                if (respuesta.ok) {
+                                    const datos = await respuesta.json();
+
+                                    if (
+                                            datos.autenticado &&
+                                            datos.usuario?.rol === "cliente" &&
+                                            datos.usuario?.id
+                                            ) {
+                                        return `carrito_usuario_${datos.usuario.id}`;
+                                    }
+                                }
+                            } catch (error) {
+                                console.error("No se pudo resolver la sesión para el carrito:", error);
+                            }
+
+                            return "carrito_invitado";
+                        })();
+                    }
+
+                    return promesaClave;
+                };
+            })();
+
+            async function actualizarContadorCarrito() {
                 const contador = document.getElementById("contadorCarrito");
 
                 if (!contador)
                     return;
 
-                const clave = "carritoLasDeliciasDeGra";
                 let carrito = [];
 
                 try {
+                    const clave = await window.obtenerClaveCarrito();
                     carrito = JSON.parse(localStorage.getItem(clave)) || [];
                 } catch (error) {
                     carrito = [];
@@ -635,6 +687,7 @@
 
 
         </script>
+        <script src="../js/configuracion-publica.js"></script>
         <script src="../js/sesion.js"></script>
     </body>
 </html>

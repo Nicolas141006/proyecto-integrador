@@ -19,11 +19,11 @@
             <div class="top-bar">
                 <div class="top-bar__container">
                     <div class="top-bar__contact">
-                        <a href="tel:+51945762189">
+                        <a href="tel:+51945762189" data-config="telefono-href">
                             <i class="fa-solid fa-phone"></i>
-                            <span>945 762 189</span>
+                            <span data-config="telefono-texto">945 762 189</span>
                         </a>
-                        <a href="https://wa.me/51945762189" target="_blank" rel="noopener noreferrer">
+                        <a href="https://wa.me/51945762189" target="_blank" rel="noopener noreferrer" data-config="whatsapp-href">
                             <i class="fa-brands fa-whatsapp"></i>
                             <span>WhatsApp</span>
                         </a>
@@ -40,9 +40,14 @@
                             <span class="cart-count" id="contadorCarrito">0</span>
                         </a>
 
-                        <a href="html/login.html">
+                        <a href="fidelizacion.html" id="fidelizacionLink" hidden>
+                            <i class="fa-solid fa-heart" aria-hidden="true"></i>
+                            <span>Fidelización</span>
+                        </a>
+
+                        <a href="login.html" id="loginLink">
                             <i class="fa-solid fa-user" aria-hidden="true"></i>
-                            <span>Iniciar sesión</span>
+                            <span id="loginTexto">Iniciar sesión</span>
                         </a>
 
                     </div>
@@ -123,20 +128,22 @@
                         href="https://maps.app.goo.gl/tDPpxJyVBvx9dZFa7"
                         target="_blank"
                         rel="noopener noreferrer"
+                        data-config="maps-href"
                         >
                         <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                        <span>Chorrillos, Lima, Perú</span>
+                        <span data-config="direccion-texto">Chorrillos, Lima, Perú</span>
                     </a>
 
-                    <a href="tel:+51945762189">
+                    <a href="tel:+51945762189" data-config="telefono-href">
                         <i class="fa-solid fa-phone" aria-hidden="true"></i>
-                        <span>945 762 189</span>
+                        <span data-config="telefono-texto">945 762 189</span>
                     </a>
 
                     <a
                         href="https://wa.me/51945762189"
                         target="_blank"
                         rel="noopener noreferrer"
+                        data-config="whatsapp-href"
                         >
                         <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                         <span>WhatsApp</span>
@@ -152,6 +159,7 @@
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Facebook"
+                            data-config="facebook-href"
                             >
                             <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
                         </a>
@@ -161,6 +169,7 @@
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Instagram"
+                            data-config="instagram-href"
                             >
                             <i class="fa-brands fa-instagram" aria-hidden="true"></i>
                         </a>
@@ -170,6 +179,7 @@
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="WhatsApp"
+                            data-config="whatsapp-href"
                             >
                             <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                         </a>
@@ -183,7 +193,47 @@
 
         <script>
             const WHATSAPP = "51945762189";
-            const CLAVE_CARRITO = "carritoLasDeliciasDeGra";
+
+            // Resuelve la clave de localStorage del carrito según la sesión
+            // actual (ver explicación completa en js/sesion.js, que define
+            // la misma función en esta página).
+            (function () {
+                if (window.obtenerClaveCarrito) return;
+
+                let promesaClave = null;
+
+                window.obtenerClaveCarrito = function obtenerClaveCarrito() {
+                    if (!promesaClave) {
+                        promesaClave = (async () => {
+                            try {
+                                const respuesta = await fetch("/api/sesion", {
+                                    credentials: "same-origin",
+                                    cache: "no-store"
+                                });
+
+                                if (respuesta.ok) {
+                                    const datos = await respuesta.json();
+
+                                    if (
+                                            datos.autenticado &&
+                                            datos.usuario?.rol === "cliente" &&
+                                            datos.usuario?.id
+                                            ) {
+                                        return `carrito_usuario_${datos.usuario.id}`;
+                                    }
+                                }
+                            } catch (error) {
+                                console.error("No se pudo resolver la sesión para el carrito:", error);
+                            }
+
+                            return "carrito_invitado";
+                        })();
+                    }
+
+                    return promesaClave;
+                };
+            })();
+
             const detalle = document.getElementById("detalleProducto");
             const relacionados = document.getElementById("productosRelacionados");
             const seccionRelacionados = document.getElementById("seccionRelacionados");
@@ -315,7 +365,7 @@
                         <div class="detalle-informacion">
                             <span class="detalle-categoria">${escaparHTML(categoria)}</span>
                             <h1>${escaparHTML(nombre)}</h1>
-                            <p class="detalle-precio">${escaparHTML(precio)}</p>
+                            <p class="detalle-precio" id="precioMostrado">${escaparHTML(precio)}</p>
                             <p class="detalle-descripcion">${escaparHTML(descripcion)}</p>
 
                             ${producto.detalles ? `
@@ -387,9 +437,39 @@
                 });
 
                 const presentacion = document.getElementById("presentacion");
-                if (presentacion) {
-                    presentacion.addEventListener("change", actualizarWhatsApp);
+
+                // El precio de la presentación elegida manda sobre el precio
+                // principal: se usa para mostrar, para el mensaje de WhatsApp
+                // y para lo que se guarda en el carrito.
+                function precioVigente() {
+                    if (presentacion && producto.presentaciones) {
+                        const valor = Number(producto.presentaciones[presentacion.value]);
+
+                        if (Number.isFinite(valor)) {
+                            return valor;
+                        }
+                    }
+
+                    return precioProducto(producto);
                 }
+
+                function precioVigenteTexto() {
+                    const valor = precioVigente();
+                    return valor === null ? "Consultar precio" : `S/ ${valor.toFixed(2)}`;
+                }
+
+                function actualizarPrecioMostrado() {
+                    document.getElementById("precioMostrado").textContent = precioVigenteTexto();
+                }
+
+                if (presentacion) {
+                    presentacion.addEventListener("change", () => {
+                        actualizarPrecioMostrado();
+                        actualizarWhatsApp();
+                    });
+                }
+
+                actualizarPrecioMostrado();
 
                 document.querySelectorAll(".miniatura").forEach(boton => {
                     boton.addEventListener("click", () => {
@@ -405,23 +485,25 @@
 
                 function actualizarWhatsApp() {
                     const tamano = presentacion ? `\nPresentación: ${presentacion.value}` : "";
-                    const mensaje = `Hola, quisiera consultar por este producto:\nProducto: ${nombre}\nCantidad: ${cantidad}${tamano}\nPrecio mostrado: ${precio}`;
+                    const mensaje = `Hola, quisiera consultar por este producto:\nProducto: ${nombre}\nCantidad: ${cantidad}${tamano}\nPrecio mostrado: ${precioVigenteTexto()}`;
                     document.getElementById("consultarWhatsApp").href =
                             `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
                 }
 
                 actualizarWhatsApp();
 
-                document.getElementById("agregarCarrito").addEventListener("click", () => {
+                document.getElementById("agregarCarrito").addEventListener("click", async () => {
                     if (esCotizacion) {
                         document.getElementById("mensajeCarrito").textContent =
                                 "Este producto no tiene un precio registrado. Consúltalo por WhatsApp antes de agregarlo.";
                         return;
                     }
 
+                    const clave = await window.obtenerClaveCarrito();
+
                     let carrito = [];
                     try {
-                        carrito = JSON.parse(localStorage.getItem("carritoLasDeliciasDeGra")) || [];
+                        carrito = JSON.parse(localStorage.getItem(clave)) || [];
                     } catch {
                         carrito = [];
                     }
@@ -439,14 +521,14 @@
                             id: identificador,
                             nombre,
                             imagen,
-                            precio: precioProducto(producto),
+                            precio: precioVigente(),
                             cantidad,
                             presentacion: tamano
                         });
                     }
 
-                    localStorage.setItem(CLAVE_CARRITO, JSON.stringify(carrito));
-                    actualizarContadorCarrito();
+                    localStorage.setItem(clave, JSON.stringify(carrito));
+                    await actualizarContadorCarrito();
                     window.dispatchEvent(new Event("carritoActualizado"));
                     document.getElementById("mensajeCarrito").textContent =
                             "Producto agregado al carrito.";
@@ -501,7 +583,7 @@
                 toggle.setAttribute("aria-label", abierto ? "Cerrar menú" : "Abrir menú");
             });
 
-            function actualizarContadorCarrito() {
+            async function actualizarContadorCarrito() {
                 const contador = document.getElementById("contadorCarrito");
 
                 if (!contador)
@@ -510,7 +592,8 @@
                 let carrito = [];
 
                 try {
-                    carrito = JSON.parse(localStorage.getItem(CLAVE_CARRITO)) || [];
+                    const clave = await window.obtenerClaveCarrito();
+                    carrito = JSON.parse(localStorage.getItem(clave)) || [];
                 } catch (error) {
                     carrito = [];
                 }
@@ -524,5 +607,7 @@
 
             actualizarContadorCarrito();
         </script>
+        <script src="../js/configuracion-publica.js"></script>
+        <script src="../js/sesion.js"></script>
     </body>
 </html>

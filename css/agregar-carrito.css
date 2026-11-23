@@ -61,6 +61,10 @@
     gap: 30px;
 }
 
+.carrito-layout[hidden] {
+    display: none;
+}
+
 .carrito-productos {
     min-width: 0;
 }
@@ -179,18 +183,6 @@
 
 .resumen-total strong {
     font-size: 1.35rem;
-}
-
-.aviso-anticipacion {
-    margin: 22px 0;
-    color: var(--texto);
-    font-size: 0.88rem;
-    line-height: 1.6;
-}
-
-.aviso-anticipacion i {
-    margin-right: 5px;
-    color: var(--dorado-oscuro);
 }
 
 .btn-continuar {

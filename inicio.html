@@ -42,15 +42,16 @@
 
                     <div class="top-bar__contact" aria-label="Información de contacto">
 
-                        <a href="tel:+51945762189">
+                        <a href="tel:+51945762189" data-config="telefono-href">
                             <i class="fa-solid fa-phone" aria-hidden="true"></i>
-                            <span>945 762 189</span>
+                            <span data-config="telefono-texto">945 762 189</span>
                         </a>
 
                         <a
                             href="https://wa.me/51945762189"
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-config="whatsapp-href"
                             >
                             <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                             <span>WhatsApp</span>
@@ -70,6 +71,11 @@
                             <span class="cart-count" id="contadorCarrito">0</span>
                         </a>
 
+                        <a href="html/fidelizacion.html" id="fidelizacionLink" hidden>
+                            <i class="fa-solid fa-heart" aria-hidden="true"></i>
+                            <span>Fidelización</span>
+                        </a>
+                        
                         <a href="html/login.html" id="loginLink">
                             <i class="fa-solid fa-user" aria-hidden="true"></i>
                             <span id="loginTexto">Iniciar sesión</span>
@@ -188,6 +194,7 @@
                             class="btn btn--outline"
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-config="whatsapp-href"
                             >
                             Consultar por WhatsApp
                         </a>
@@ -607,6 +614,7 @@
                         class="btn btn--outline-light"
                         target="_blank"
                         rel="noopener noreferrer"
+                        data-config="whatsapp-href"
                         >
                         Consultar por WhatsApp
                     </a>
@@ -674,8 +682,8 @@
                     <h4>Horario de atención</h4>
 
                     <p>
-                        <span>Lunes a domingo</span>
-                        <span>9:00 a. m. – 9:00 p. m.</span>
+                        <span data-config="horario-dias">Lunes a domingo</span>
+                        <span data-config="horario-horas">9:00 a. m. – 9:00 p. m.</span>
                     </p>
 
                 </div>
@@ -687,20 +695,22 @@
                         href="https://maps.app.goo.gl/tDPpxJyVBvx9dZFa7"
                         target="_blank"
                         rel="noopener noreferrer"
+                        data-config="maps-href"
                         >
                         <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                        <span>Chorrillos, Lima, Perú</span>
+                        <span data-config="direccion-texto">Chorrillos, Lima, Perú</span>
                     </a>
 
-                    <a href="tel:+51945762189">
+                    <a href="tel:+51945762189" data-config="telefono-href">
                         <i class="fa-solid fa-phone" aria-hidden="true"></i>
-                        <span>945 762 189</span>
+                        <span data-config="telefono-texto">945 762 189</span>
                     </a>
 
                     <a
                         href="https://wa.me/51945762189"
                         target="_blank"
                         rel="noopener noreferrer"
+                        data-config="whatsapp-href"
                         >
                         <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                         <span>WhatsApp</span>
@@ -717,6 +727,7 @@
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Buscar a Graciela Alina Fasanando Huapaya en Facebook"
+                            data-config="facebook-href"
                             >
                             <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
                         </a>
@@ -726,6 +737,7 @@
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Instagram de Las Delicias de Gra"
+                            data-config="instagram-href"
                             >
                             <i class="fa-brands fa-instagram" aria-hidden="true"></i>
                         </a>
@@ -735,6 +747,7 @@
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="WhatsApp de Las Delicias de Gra"
+                            data-config="whatsapp-href"
                             >
                             <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                         </a>
@@ -800,6 +813,7 @@
             document.addEventListener("DOMContentLoaded", async () => {
                 const loginLink = document.getElementById("loginLink");
                 const loginTexto = document.getElementById("loginTexto");
+                const fidelizacionLink = document.getElementById("fidelizacionLink");
 
                 if (!loginLink || !loginTexto)
                     return;
@@ -818,7 +832,7 @@
                     if (!datos.autenticado || datos.usuario.rol !== "cliente") {
                         return;
                     }
-
+                    fidelizacionLink.hidden = false;
                     loginTexto.textContent = datos.usuario.nombre;
                     loginLink.href = "#";
                     loginLink.title = "Cerrar sesión";
@@ -855,6 +869,7 @@
                 }
             });
         </script>
+        <script src="js/configuracion-publica.js"></script>
         <script src="js/sesion.js"></script>
     </body>
 </html>

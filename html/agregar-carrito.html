@@ -32,7 +32,7 @@
                 <p>Revisa tus productos antes de continuar.</p>
             </div>
 
-            <div class="carrito-layout">
+            <div class="carrito-layout" id="carritoLayout">
                 <section class="carrito-productos">
                     <div id="listaCarrito"></div>
                 </section>
@@ -50,14 +50,8 @@
                         <strong id="totalCarrito">S/ 0.00</strong>
                     </div>
 
-                    <p class="aviso-anticipacion">
-                        <i class="fa-regular fa-calendar"></i>
-                        Todos los productos deben solicitarse con un mínimo de
-                        4 días de anticipación.
-                    </p>
-
                     <button type="button" id="continuarPedido" class="btn-continuar">
-                        Continuar con el pedido
+                        Realizar pedido
                         <i class="fa-solid fa-arrow-right"></i>
                     </button>
 
@@ -66,25 +60,94 @@
                     </a>
                 </aside>
             </div>
+
+            <section class="carrito-productos" id="confirmacionPedido" hidden>
+                <div class="carrito-vacio">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <h2>¡Pedido registrado!</h2>
+                    <p>Tu pedido <strong id="confirmacionNumeroPedido"></strong> quedó
+                        registrado como pendiente.</p>
+                    <p>Coordinemos la fecha, hora y lugar de recojo directamente por
+                        WhatsApp.</p>
+                    <a href="#"
+                       id="botonWhatsappPedido"
+                       class="btn-continuar"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        Coordinar por WhatsApp
+                    </a>
+                    <a href="menu.html">Seguir comprando</a>
+                </div>
+            </section>
         </main>
 
         <footer class="carrito-footer">
             <p>© 2026 Las Delicias de Gra. Hecho con cariño.</p>
         </footer>
 
+        <script src="../js/configuracion-publica.js"></script>
         <script>
-            const CLAVE_CARRITO = "carritoLasDeliciasDeGra";
-            const WHATSAPP = "51945762189";
+            const WHATSAPP_RESPALDO = "51945762189";
+
+            // Resuelve la clave de localStorage del carrito según la sesión
+            // actual (ver explicación completa en js/sesion.js, que define
+            // la misma función en esta página).
+            (function () {
+                if (window.obtenerClaveCarrito) return;
+
+                let promesaClave = null;
+
+                window.obtenerClaveCarrito = function obtenerClaveCarrito() {
+                    if (!promesaClave) {
+                        promesaClave = (async () => {
+                            try {
+                                const respuesta = await fetch("/api/sesion", {
+                                    credentials: "same-origin",
+                                    cache: "no-store"
+                                });
+
+                                if (respuesta.ok) {
+                                    const datos = await respuesta.json();
+
+                                    if (
+                                            datos.autenticado &&
+                                            datos.usuario?.rol === "cliente" &&
+                                            datos.usuario?.id
+                                            ) {
+                                        return `carrito_usuario_${datos.usuario.id}`;
+                                    }
+                                }
+                            } catch (error) {
+                                console.error("No se pudo resolver la sesión para el carrito:", error);
+                            }
+
+                            return "carrito_invitado";
+                        })();
+                    }
+
+                    return promesaClave;
+                };
+            })();
+
+            // Clave resuelta de forma asíncrona antes del primer render (ver
+            // IIFE al final del script); "carrito_invitado" es solo el valor
+            // provisional mientras se resuelve la sesión.
+            let claveCarritoActual = "carrito_invitado";
 
             const listaCarrito = document.getElementById("listaCarrito");
             const cantidadProductos = document.getElementById("cantidadProductos");
             const totalCarrito = document.getElementById("totalCarrito");
             const botonContinuar = document.getElementById("continuarPedido");
+            const carritoLayout = document.getElementById("carritoLayout");
+            const confirmacionPedido = document.getElementById("confirmacionPedido");
+            const confirmacionNumeroPedido = document.getElementById("confirmacionNumeroPedido");
+            const botonWhatsappPedido = document.getElementById("botonWhatsappPedido");
 
             function obtenerCarrito() {
                 try {
                     const carrito = JSON.parse(
-                            localStorage.getItem(CLAVE_CARRITO)
+                            localStorage.getItem(claveCarritoActual)
                             );
 
                     return Array.isArray(carrito) ? carrito : [];
@@ -94,7 +157,7 @@
             }
 
             function guardarCarrito(carrito) {
-                localStorage.setItem(CLAVE_CARRITO, JSON.stringify(carrito));
+                localStorage.setItem(claveCarritoActual, JSON.stringify(carrito));
             }
 
             function escaparHTML(texto) {
@@ -325,30 +388,27 @@
                         `Número de pedido: ${resultado.pedidoId}`,
                         `Cliente: ${resultado.cliente.nombre}`,
                         `Celular: ${resultado.cliente.celular}`,
-                        "Entrega: Recojo en casa",
                         "",
                         ...lineas,
                         "",
                         `Subtotal: ${dinero(resultado.subtotal)}`,
                         `Total registrado: ${dinero(resultado.total)}`,
                         "",
-                        "Quisiera coordinar la fecha de recojo. "
-                                + "Sé que se requieren al menos 4 días de anticipación."
+                        "Quedo atento(a) para coordinar la fecha, hora y lugar de recojo."
                     ].join("\n");
 
-                    localStorage.removeItem(CLAVE_CARRITO);
+                    localStorage.removeItem(claveCarritoActual);
 
-                    renderizarCarrito();
+                    const configuracion = await (window.configuracionPublica || Promise.resolve(null));
+                    const whatsapp = configuracion?.datosNegocio?.whatsapp || WHATSAPP_RESPALDO;
 
-                    window.open(
-                            `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(mensaje)}`,
-                            "_blank",
-                            "noopener,noreferrer"
-                            );
+                    confirmacionNumeroPedido.textContent = "N.º " + resultado.pedidoId;
+                    botonWhatsappPedido.href =
+                            `https://wa.me/${whatsapp}?text=${encodeURIComponent(mensaje)}`;
 
-                    alert(
-                            `Pedido N.º ${resultado.pedidoId} registrado correctamente.`
-                            );
+                    carritoLayout.hidden = true;
+                    confirmacionPedido.hidden = false;
+                    confirmacionPedido.scrollIntoView({behavior: "smooth", block: "start"});
 
                 } catch (error) {
                     alert(error.message || "Ocurrió un error al procesar el pedido.");
@@ -357,7 +417,10 @@
                 }
             });
 
-            renderizarCarrito();
+            (async () => {
+                claveCarritoActual = await window.obtenerClaveCarrito();
+                renderizarCarrito();
+            })();
         </script>
 
     </body>

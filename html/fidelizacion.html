@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Mi fidelización | Las Delicias de Gra</title>
+
+        <link rel="stylesheet" href="../css/global.css">
+        <link rel="stylesheet" href="../css/fidelizacion.css">
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet">
+
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    </head>
+
+    <body class="fidelizacion-page">
+
+        <header class="fidelizacion-header">
+            <a href="../inicio.html" class="fidelizacion-brand">
+                <i class="fa-solid fa-cake-candles"></i>
+                <span>Las Delicias de Gra</span>
+            </a>
+
+            <a href="../inicio.html" class="volver-inicio">
+                <i class="fa-solid fa-arrow-left"></i>
+                Volver a la tienda
+            </a>
+        </header>
+
+        <main class="fidelizacion-main">
+
+            <section class="fidelizacion-intro">
+                <span class="section-label">Beneficios para ti</span>
+
+                <h1>Tu fidelidad tiene recompensa</h1>
+
+                <p>
+                    Gracias por elegir Las Delicias de Gra.
+                    Consulta tus compras y descubre los regalos que tenemos para ti.
+                </p>
+            </section>
+
+            <section class="fidelizacion-saludo">
+                <div>
+                    <span>¡Hola!</span>
+                    <h2 id="nombreCliente">Cliente</h2>
+                    <p>Este es tu progreso de fidelización.</p>
+                </div>
+
+                <div class="fidelizacion-icono">
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+            </section>
+
+            <section class="fidelizacion-resumen">
+
+                <article class="resumen-card">
+                    <div class="resumen-icono">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                    </div>
+
+                    <div>
+                        <span>Compras entregadas</span>
+                        <strong id="totalCompras">0</strong>
+                    </div>
+                </article>
+
+                <article class="resumen-card">
+                    <div class="resumen-icono">
+                        <i class="fa-solid fa-gift"></i>
+                    </div>
+
+                    <div>
+                        <span>Progreso para tu premio</span>
+                        <strong id="progresoCompras">0 de 8</strong>
+                    </div>
+                </article>
+
+            </section>
+
+            <section class="fidelizacion-progreso">
+
+                <div class="progreso-heading">
+                    <div>
+                        <span class="section-label">Tu camino al premio</span>
+                        <h2>Completa ocho compras</h2>
+                    </div>
+
+                    <strong id="porcentajeProgreso">0%</strong>
+                </div>
+
+                <div class="barra-progreso">
+                    <div id="barraProgreso"></div>
+                </div>
+
+                <p id="mensajeProgreso">
+                    Realiza tu primera compra para comenzar.
+                </p>
+
+            </section>
+
+            <section class="fidelizacion-beneficios">
+
+                <article class="beneficio-card">
+                    <div class="beneficio-icono">
+                        <i class="fa-solid fa-cookie-bite"></i>
+                    </div>
+
+                    <div class="beneficio-contenido">
+                        <span class="beneficio-etiqueta">Primera compra</span>
+
+                        <h3>Una docena de mini alfajores</h3>
+
+                        <p>
+                            Recibe una docena de mini alfajores de cortesía
+                            en tu primera compra.
+                        </p>
+
+                        <strong id="estadoPrimeraCompra">
+                            Pendiente de tu primera compra
+                        </strong>
+                    </div>
+                </article>
+
+                <article class="beneficio-card">
+                    <div class="beneficio-icono">
+                        <i class="fa-solid fa-gift"></i>
+                    </div>
+
+                    <div class="beneficio-contenido">
+                        <span class="beneficio-etiqueta">Novena compra</span>
+
+                        <h3>Un regalo especial</h3>
+
+                        <p>
+                            Después de completar ocho compras, recibirás
+                            un regalo especial en tu novena compra.
+                        </p>
+
+                        <strong id="estadoPremio">
+                            Completa ocho compras para conseguirlo
+                        </strong>
+                    </div>
+                </article>
+
+            </section>
+
+            <section class="fidelizacion-historial">
+                <div class="progreso-heading">
+                    <div>
+                        <span class="section-label">Tu historial</span>
+                        <h2>Compras entregadas</h2>
+                    </div>
+                </div>
+
+                <div id="listaHistorialCompras" class="historial-lista">
+                    <p class="historial-vacio">Cargando tu historial...</p>
+                </div>
+            </section>
+
+            <p id="mensajeError" class="fidelizacion-error" hidden></p>
+
+        </main>
+
+        <footer class="fidelizacion-footer">
+            © 2026 Las Delicias de Gra. Todos los derechos reservados.
+        </footer>
+
+        <script src="../js/fidelizacion.js"></script>
+
+    </body>
+</html>

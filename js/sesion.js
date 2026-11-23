@@ -1,17 +1,66 @@
 
+// Resuelve la clave de localStorage del carrito según la sesión actual:
+// cada cuenta de cliente tiene su propio carrito ("carrito_usuario_<id>");
+// sin sesión de cliente se usa un carrito de invitado aparte
+// ("carrito_invitado"). Nunca se vuelve a leer/escribir la clave global
+// antigua ("carritoLasDeliciasDeGra"): sus datos quedan intactos pero sin
+// asignarse a ninguna cuenta. Esta misma función se repite tal cual en
+// menu.html, detalle-producto.html y agregar-carrito.html (no hay un
+// sistema de módulos en el proyecto); el IIFE evita que esas copias choquen
+// entre sí cuando varias cargan en la misma página.
+(function () {
+    if (window.obtenerClaveCarrito) return;
+
+    let promesaClave = null;
+
+    window.obtenerClaveCarrito = function obtenerClaveCarrito() {
+        if (!promesaClave) {
+            promesaClave = (async () => {
+                try {
+                    const respuesta = await fetch("/api/sesion", {
+                        credentials: "same-origin",
+                        cache: "no-store"
+                    });
+
+                    if (respuesta.ok) {
+                        const datos = await respuesta.json();
+
+                        if (
+                                datos.autenticado &&
+                                datos.usuario?.rol === "cliente" &&
+                                datos.usuario?.id
+                                ) {
+                            return `carrito_usuario_${datos.usuario.id}`;
+                        }
+                    }
+                } catch (error) {
+                    console.error("No se pudo resolver la sesión para el carrito:", error);
+                }
+
+                return "carrito_invitado";
+            })();
+        }
+
+        return promesaClave;
+    };
+})();
+
 document.addEventListener("DOMContentLoaded", () => {
     const loginLink = document.getElementById("loginLink");
     const loginTexto = document.getElementById("loginTexto");
+    const fidelizacionLink = document.getElementById("fidelizacionLink");
 
-    // Actualizar el contador del carrito.
-    function actualizarContadorCarrito() {
+    // Actualizar el contador del carrito (propio de la cuenta autenticada).
+    async function actualizarContadorCarrito() {
         const contador = document.getElementById("contadorCarrito");
 
         if (!contador) return;
 
         try {
+            const clave = await window.obtenerClaveCarrito();
+
             const carrito = JSON.parse(
-                localStorage.getItem("carritoLasDeliciasDeGra") || "[]"
+                localStorage.getItem(clave) || "[]"
             );
 
             const cantidad = carrito.reduce((total, producto) => {
@@ -43,7 +92,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 loginTexto.textContent = "Iniciar sesión";
                 loginLink.href = "login.html";
                 loginLink.onclick = null;
+
+                if (fidelizacionLink)
+                    fidelizacionLink.hidden = true;
+
                 return;
+            }
+
+            if (fidelizacionLink) {
+                fidelizacionLink.hidden = datos.usuario.rol !== "cliente";
             }
 
             loginTexto.textContent = datos.usuario.nombre;
